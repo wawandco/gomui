@@ -9,12 +9,10 @@ import (
 type BadgeVariant string
 
 const (
-	BadgePrimary     BadgeVariant = " badge"
+	BadgePrimary     BadgeVariant = "badge"
 	BadgeSecondary   BadgeVariant = "badge-secondary"
 	BadgeDestructive BadgeVariant = "badge-destructive"
 	BadgeOutline     BadgeVariant = "badge-outline"
-	BadgeSuccess     BadgeVariant = "badge-success"
-	BadgeWarning     BadgeVariant = "badge-warning"
 )
 
 // Badge creates a colored status label

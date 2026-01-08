@@ -1,14 +1,14 @@
 # Basecoat UI for Gomponents
 
-A comprehensive Go wrapper library for [Basecoat UI](https://www.basecoat.dev/) components, built on top of [gomponents](https://maragu.dev/gomponents). Write beautiful, type-safe UI components in pure Go with no templating languages required.
+A comprehensive Go wrapper library for [Basecoat UI](https://basecoatui.com/) components, built on top of [gomponents](https://maragu.dev/gomponents). Write beautiful, type-safe UI components in pure Go with no templating languages required.
 
 ## Features
 
 ✨ **Pure Go** - No templating languages, just Go functions  
-🎨 **Complete Component Library** - 40+ pre-built Basecoat UI components  
-🌓 **Dark Mode Support** - Built-in dark mode with localStorage persistence  
+🎨 **Component Library** - Pre-built Basecoat UI components  
+🌓 **Dark Mode Support** - Built-in dark mode with system preference detection and localStorage persistence  
 🔒 **Type-Safe** - Compile-time checking for your UI components  
-⚡ **Zero Runtime** - Renders to pure HTML with minimal JavaScript  
+⚡ **Minimal JavaScript** - Renders to pure HTML with minimal JavaScript  
 🎯 **Framework Agnostic** - Works with any Go web framework  
 
 ## Installation
@@ -28,8 +28,8 @@ Then include Basecoat UI CSS and JavaScript using our helper components in your 
 <!-- In your Go code: gm.BasecoatCSS() and gm.BasecoatJS() -->
 
 <!-- Or manually include Basecoat assets -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.9/dist/basecoat.cdn.min.css">
-<script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.9/dist/js/all.min.js" defer></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.10-beta.2/dist/basecoat.cdn.min.css">
+<script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.10-beta.2/dist/js/all.min.js" defer></script>
 ```
 
 ## Quick Start
@@ -47,12 +47,11 @@ func MyPage() g.Node {
     return Html(
         Head(
             TitleEl(g.Text("My App")),
+            gm.DarkModeScript(), // Enable dark mode (place first)
             gm.BasecoatAssets(), // Include Basecoat CSS and JS
-            gm.DarkModeScript(), // Enable dark mode
         ),
         Body(
             Div(Class("container mx-auto p-4"),
-                gm.ThemeToggle("theme-btn"),
                 gm.Card(
                     gm.CardHeader(
                         gm.CardTitle(g.Text("Welcome!")),
@@ -88,10 +87,13 @@ Head(
 Add a theme toggle button anywhere in your UI:
 
 ```go
-gm.ThemeToggle("theme-toggle")
+gm.ThemeToggle(
+    // Add your SVG icons for light/dark mode here
+    g.Raw(`<span class="hidden dark:block">☀️</span><span class="block dark:hidden">🌙</span>`),
+)
 ```
 
-The theme preference is automatically saved to `localStorage` and persists across sessions.
+The theme preference is automatically saved to `localStorage` and persists across sessions. The system also detects the user's OS preference on first load.
 
 ## Component Reference
 
@@ -138,14 +140,14 @@ gm.LinkButtonEl(gm.ButtonOutline, gm.ButtonLg, "/docs", g.Text("Documentation"))
 
 ```go
 gm.Form(
-    gm.FormField(
-        gm.FormLabel("email", g.Text("Email")),
-        gm.Input(Type("email"), ID("email"), Placeholder("you@example.com")),
-        gm.FormDescription(g.Text("We'll never share your email.")),
+    gm.Field(
+        gm.Label(g.Attr("for", "email"), g.Text("Email")),
+        gm.Input(h.Type("email"), h.ID("email"), h.Placeholder("you@example.com")),
+        gm.FieldDescription(g.Text("We'll never share your email.")),
     ),
-    gm.FormField(
-        gm.FormLabel("message", g.Text("Message")),
-        gm.Textarea(ID("message"), Placeholder("Your message...")),
+    gm.Field(
+        gm.Label(g.Attr("for", "message"), g.Text("Message")),
+        gm.Textarea(h.ID("message"), h.Placeholder("Your message...")),
     ),
     gm.Button(gm.ButtonPrimary, gm.ButtonDefault, g.Text("Submit")),
 )
@@ -172,19 +174,13 @@ gm.Card(
 
 ```go
 // Default alert
-gm.Alert(gm.AlertDefault,
+gm.Alert(
     gm.AlertTitle(g.Text("Heads up!")),
     gm.AlertDescription(g.Text("This is an alert message.")),
 )
 
-// Success alert
-gm.Alert(gm.AlertSuccess,
-    gm.AlertTitle(g.Text("Success!")),
-    gm.AlertDescription(g.Text("Operation completed.")),
-)
-
 // Destructive alert
-gm.Alert(gm.AlertDestructive,
+gm.AlertDestructive(
     gm.AlertTitle(g.Text("Error")),
     gm.AlertDescription(g.Text("Something went wrong.")),
 )
@@ -193,12 +189,10 @@ gm.Alert(gm.AlertDestructive,
 ### Badges
 
 ```go
-gm.Badge(gm.BadgeDefault, g.Text("Default"))
+gm.Badge(gm.BadgePrimary, g.Text("Primary"))
 gm.Badge(gm.BadgeSecondary, g.Text("Secondary"))
 gm.Badge(gm.BadgeDestructive, g.Text("Destructive"))
 gm.Badge(gm.BadgeOutline, g.Text("Outline"))
-gm.Badge(gm.BadgeSuccess, g.Text("Success"))
-gm.Badge(gm.BadgeWarning, g.Text("Warning"))
 ```
 
 ### Tables
@@ -225,16 +219,17 @@ gm.Table(
 ### Dialogs/Modals
 
 ```go
-gm.Dialog(true, // open state
-    gm.DialogContent(
-        gm.DialogHeader(
-            gm.DialogTitle(g.Text("Confirm Action")),
-            gm.DialogDescription(g.Text("Are you sure?")),
-        ),
-        gm.DialogFooter(
-            gm.Button(gm.ButtonOutline, gm.ButtonDefault, g.Text("Cancel")),
-            gm.Button(gm.ButtonPrimary, gm.ButtonDefault, g.Text("Confirm")),
-        ),
+gm.Dialog(
+    gm.DialogHeader(
+        gm.DialogTitle(g.Text("Confirm Action")),
+        gm.DialogDescription(g.Text("Are you sure?")),
+    ),
+    gm.DialogSection(
+        // Dialog content here
+    ),
+    gm.DialogFooter(
+        gm.Button(gm.ButtonOutline, gm.ButtonDefault, g.Text("Cancel")),
+        gm.Button(gm.ButtonPrimary, gm.ButtonDefault, g.Text("Confirm")),
     ),
 )
 ```
@@ -244,10 +239,10 @@ gm.Dialog(true, // open state
 ```go
 gm.Tabs(
     gm.TabsList(
-        gm.TabsTrigger("account", g.Text("Account")),
-        gm.TabsTrigger("password", g.Text("Password")),
+        gm.TabItem("account-tab", true, g.Text("Account")),
+        gm.TabItem("password-tab", false, g.Text("Password")),
     ),
-    gm.TabsContent("account",
+    gm.TabPanel("account-panel", "account-tab", true,
         gm.Card(
             gm.CardHeader(
                 gm.CardTitle(g.Text("Account Settings")),
@@ -257,35 +252,13 @@ gm.Tabs(
             ),
         ),
     ),
-    gm.TabsContent("password",
+    gm.TabPanel("password-panel", "password-tab", false,
         gm.Card(
             gm.CardHeader(
                 gm.CardTitle(g.Text("Password Settings")),
             ),
             gm.CardContent(
                 g.Text("Password content here"),
-            ),
-        ),
-    ),
-)
-```
-
-### Navigation Menu
-
-```go
-gm.NavigationMenu(
-    gm.NavigationMenuList(
-        gm.NavigationMenuItem(
-            gm.NavigationMenuLink("/", g.Text("Home")),
-        ),
-        gm.NavigationMenuItem(
-            gm.NavigationMenuLink("/about", g.Text("About")),
-        ),
-        gm.NavigationMenuItem(
-            gm.NavigationMenuTrigger(g.Text("Products")),
-            gm.NavigationMenuContent(
-                gm.NavigationMenuLink("/products/web", g.Text("Web")),
-                gm.NavigationMenuLink("/products/mobile", g.Text("Mobile")),
             ),
         ),
     ),
@@ -317,142 +290,81 @@ gm.Accordion(
 gm.DropdownMenu(
     gm.DropdownMenuTrigger(g.Text("Options")),
     gm.DropdownMenuContent(
-        gm.DropdownMenuLabel(g.Text("My Account")),
-        gm.DropdownMenuSeparator(),
-        gm.DropdownMenuItem(g.Text("Profile")),
-        gm.DropdownMenuItem(g.Text("Settings")),
-        gm.DropdownMenuSeparator(),
-        gm.DropdownMenuItem(g.Text("Logout")),
-    ),
-)
-```
-
-### Breadcrumbs
-
-```go
-gm.Breadcrumb(
-    gm.BreadcrumbList(
-        gm.BreadcrumbItem(
-            gm.BreadcrumbLink("/", g.Text("Home")),
+        gm.DropdownMenuMenu(
+            gm.DropdownMenuGroup(
+                gm.DropdownMenuGroupHeading(g.Text("My Account")),
+                gm.DropdownMenuItem(g.Text("Profile")),
+                gm.DropdownMenuItem(g.Text("Settings")),
+            ),
+            gm.DropdownMenuSeparator(),
+            gm.DropdownMenuItem(g.Text("Logout")),
         ),
-        gm.BreadcrumbSeparator(),
-        gm.BreadcrumbItem(
-            gm.BreadcrumbLink("/products", g.Text("Products")),
-        ),
-        gm.BreadcrumbSeparator(),
-        gm.BreadcrumbItem(g.Text("Current Page")),
-    ),
-)
-```
-
-### Pagination
-
-```go
-gm.Pagination(
-    gm.PaginationContent(
-        gm.PaginationItem(gm.PaginationPrevious("/page/1")),
-        gm.PaginationItem(gm.PaginationLink("/page/1", false, g.Text("1"))),
-        gm.PaginationItem(gm.PaginationLink("/page/2", true, g.Text("2"))),
-        gm.PaginationItem(gm.PaginationLink("/page/3", false, g.Text("3"))),
-        gm.PaginationItem(gm.PaginationNext("/page/3")),
-    ),
-)
-```
-
-### Avatar
-
-```go
-gm.Avatar(
-    gm.AvatarImage("/avatar.jpg", "User avatar"),
-    gm.AvatarFallback(g.Text("JD")),
-)
-```
-
-### Progress Bar
-
-```go
-gm.Progress(65) // 65% complete
-```
-
-### Skeleton Loaders
-
-```go
-gm.Card(
-    gm.CardContent(
-        gm.Skeleton(StyleEl(g.Attr("style", "height: 20px; margin-bottom: 8px"))),
-        gm.Skeleton(StyleEl(g.Attr("style", "height: 20px; margin-bottom: 8px"))),
-        gm.Skeleton(StyleEl(g.Attr("style", "height: 20px; width: 60%"))),
     ),
 )
 ```
 
 ## Complete Component List
 
-### Layout & Structure
-- `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `CardFooter`
-- `Separator`
-- `ScrollArea`
-- `AspectRatio`
+All components are validated against [Basecoat UI v0.3.10-beta.2](https://basecoatui.com/) documentation.
 
-### Navigation
-- `NavigationMenu`, `NavigationMenuList`, `NavigationMenuItem`, `NavigationMenuTrigger`, `NavigationMenuContent`, `NavigationMenuLink`
-- `Breadcrumb`, `BreadcrumbList`, `BreadcrumbItem`, `BreadcrumbLink`, `BreadcrumbSeparator`
-- `Pagination`, `PaginationContent`, `PaginationItem`, `PaginationLink`, `PaginationPrevious`, `PaginationNext`
-- `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`
-- `Menubar`, `MenubarMenu`, `MenubarTrigger`, `MenubarContent`, `MenubarItem`
+### Layout & Structure
+- `Card`, `CardWithClasses`, `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `CardFooter`
+
+### Navigation & Tabs
+- `Tabs`, `TabsList`, `TabItem`, `TabPanel`
+- `DropdownMenu`, `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuMenu`, `DropdownMenuItem`, `DropdownMenuItemCheckbox`, `DropdownMenuItemRadio`, `DropdownMenuGroup`, `DropdownMenuGroupHeading`, `DropdownMenuSeparator`
 
 ### Forms & Inputs
-- `Form`, `FormField`, `FormLabel`, `FormDescription`, `FormMessage`
-- `Input`
-- `Textarea`
-- `Select`
-- `Checkbox`
-- `Radio`, `RadioGroup`
-- `Switch`
-- `Slider`
+- `Form`, `Field`, `FieldLabel`, `FieldDescription`, `FieldError`, `Fieldset`
+- `Input`, `Textarea`
 - `Label`
+- `Checkbox`, `Radio`, `Switch`
+- `Slider`, `SliderScript()`
+- `Select` components (SelectContainer, SelectButton, SelectPopover, SelectHeader, SelectListbox, SelectOptionEl, SelectHiddenInput, SelectWithSearch, Combobox)
 
 ### Buttons & Actions
-- `Button` (with variants: Primary, Secondary, Outline, Ghost, Link, Destructive)
-- `LinkButtonEl` - Anchor elements with button styling for navigation
+- `Button`, `ButtonEl`, `ButtonWithClasses` (with variants: Primary, Secondary, Outline, Ghost, Link, Destructive)
+- `LinkButton`, `LinkButtonEl`, `LinkButtonWithClasses` - Anchor elements with button styling
+- `ButtonGroup`, `ButtonGroupWithOrientation`, `ButtonGroupSeparator`
 
 ### Data Display
-- `Table`, `TableHeader`, `TableBody`, `TableFooter`, `TableRow`, `TableHead`, `TableCell`, `TableCaption`
-- `Badge` (with variants: Default, Secondary, Destructive, Outline, Success, Warning)
-- `Avatar`, `AvatarImage`, `AvatarFallback`
-- `Progress`
-- `Skeleton`
+- `Table`, `TableEl`, `TableHeader`, `TableBody`, `TableFooter`, `TableRow`, `TableHead`, `TableData`, `TableCell`, `TableCaption`
+- `Badge` (with variants: Primary, Secondary, Destructive, Outline)
+- `Kbd`, `KbdWithClasses`, `KbdEl`
 
 ### Feedback
-- `Alert`, `AlertTitle`, `AlertDescription` (with variants: Default, Destructive, Success, Warning, Info)
-- `Toast`, `ToastTitle`, `ToastDescription`, `ToastAction`
+- `Alert`, `AlertDestructive`, `AlertTitle`, `AlertDescription`
+- `Toast`, `ToastContent`, `ToastSection`, `ToastFooter`, `ToastTitle`, `ToastDescription`, `ToastAction`, `Toaster`
 
 ### Overlays
-- `Dialog`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogFooter`
-- `Sheet`, `SheetContent`, `SheetHeader`, `SheetTitle`, `SheetDescription`, `SheetFooter`
-- `Popover`, `PopoverTrigger`, `PopoverContent`
-- `Tooltip`, `TooltipTrigger`, `TooltipContent`
-- `HoverCard`, `HoverCardTrigger`, `HoverCardContent`
+- `Dialog`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogSection`, `DialogFooter`
+- `AlertDialog`, `AlertDialogHeader`, `AlertDialogTitle`, `AlertDialogDescription`, `AlertDialogSection`, `AlertDialogFooter`
+- `Sheet`, `SheetHeader`, `SheetTitle`, `SheetDescription`, `SheetSection`, `SheetFooter`
+- `Popover`, `PopoverContent`, `PopoverHeader`
+- `HoverCard`, `HoverCardContent`, `HoverCardHeader`
 
-### Menus
-- `DropdownMenu`, `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`, `DropdownMenuSeparator`, `DropdownMenuLabel`
-- `ContextMenu`, `ContextMenuTrigger`, `ContextMenuContent`, `ContextMenuItem`
+### Command Palette
+- `Command`, `CommandDialog`, `CommandHeader`, `CommandInput`, `CommandMenu`, `CommandGroup`, `CommandGroupHeading`, `CommandItem`, `CommandSeparator`
 
-### Disclosure
-- `Accordion`, `AccordionItem`, `AccordionTrigger`, `AccordionContent`
-- `Collapsible`, `CollapsibleTrigger`, `CollapsibleContent`
-
-### Utility
-- `Command`, `CommandInput`, `CommandList`, `CommandEmpty`, `CommandGroup`, `CommandItem`
-- `Calendar`
-- `Carousel`, `CarouselContent`, `CarouselItem`, `CarouselPrevious`, `CarouselNext`
+### Sidebar
+- `Sidebar`, `SidebarHeader`, `SidebarNav`, `SidebarSection`, `SidebarGroup`, `SidebarHeading`, `SidebarList`, `SidebarItem`, `SidebarFooter`, `SidebarToggle`, `SidebarOpen`, `SidebarClose`, `SidebarAssets()`
 
 ### Theme
-- `DarkModeScript()` - Initialize dark mode
-- `ThemeToggle(id)` - Theme toggle button
-- `BasecoatCSS()` - Include Basecoat CSS from CDN
-- `BasecoatJS()` - Include Basecoat JavaScript from CDN  
-- `BasecoatAssets()` - Include both Basecoat CSS and JavaScript for convenience
+- `DarkModeScript()` - Initialize dark mode with system preference detection
+- `ThemeToggle()` - Theme toggle button (dispatches `basecoat:theme` event)
+- `BasecoatCSS()` - Include Basecoat CSS from CDN (v0.3.10-beta.2)
+- `BasecoatJS()` - Include Basecoat JavaScript from CDN (v0.3.10-beta.2)
+- `BasecoatAssets()` - Include both CSS and JavaScript
+
+### Notes
+
+**Components NOT included** (not in Basecoat or use Tailwind utilities instead):
+- Breadcrumb, Pagination - Use Tailwind utility classes with button components
+- Avatar, Skeleton, Progress - Use Tailwind utilities
+- Separator - Use `<hr role="separator">` directly
+- Tooltip - Use `data-tooltip` attribute on elements
+- NavigationMenu, ContextMenu, Menubar - Not in Basecoat
+- ScrollArea, AspectRatio, Calendar, Carousel - Not in Basecoat
 
 ## Framework Integration
 
@@ -570,12 +482,14 @@ func PageLayout(title string, content g.Node) g.Node {
     return Html(
         Head(
             TitleEl(g.Text(title)),
-            Link(Rel("stylesheet"), Href("/static/basecoat.css")),
-            gm.DarkModeScript(),
+            gm.DarkModeScript(), // Must be first
+            gm.BasecoatAssets(),
         ),
         Body(
             Div(Class("container mx-auto p-4"),
-                gm.ThemeToggle("theme"),
+                gm.ThemeToggle(
+                    g.Raw(`<span class="hidden dark:block">☀️</span><span class="block dark:hidden">🌙</span>`),
+                ),
                 content,
             ),
         ),
@@ -630,13 +544,13 @@ MIT License - see LICENSE file for details
 ## Credits
 
 - Built on top of [gomponents](https://maragu.dev/gomponents) by [@maragudk](https://github.com/maragudk)
-- Uses [Basecoat UI](https://www.basecoat.dev/) components and styling
+- Uses [Basecoat UI](https://basecoatui.com/) components and styling (v0.3.10-beta.2)
 - Inspired by [shadcn/ui](https://ui.shadcn.com/)
 
 ## Resources
 
 - [Gomponents Documentation](https://www.gomponents.com/)
-- [Basecoat UI Documentation](https://www.basecoat.dev/)
+- [Basecoat UI Documentation](https://basecoatui.com/)
 - [Go Documentation](https://golang.org/doc/)
 
 ---

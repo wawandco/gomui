@@ -100,5 +100,5 @@ func SidebarClose(sidebarID string, children ...g.Node) g.Node {
 // SidebarAssets includes the necessary JS for sidebar functionality
 // Make sure to include this in your HTML head or before the closing body tag
 func SidebarAssets() g.Node {
-	return h.Script(h.Src("https://cdn.jsdelivr.net/npm/basecoat-css@0.3.9/dist/js/sidebar.min.js"), h.Defer())
+	return h.Script(h.Src("https://cdn.jsdelivr.net/npm/basecoat-css@0.3.10-beta.2/dist/js/sidebar.min.js"), h.Defer())
 }

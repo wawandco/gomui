@@ -5,19 +5,19 @@ import (
 
 	gm "github.com/wawandco/gomui"
 	g "maragu.dev/gomponents"
-	ghtml "maragu.dev/gomponents/html"
 )
 
 func Test(t *testing.T) {
 	// Test that components are accessible from main package
 	page := gm.Card(
 		gm.CardHeader(
-			ghtml.H1(g.Text("Card Title")),
+			gm.CardTitle(g.Text("Card Title")),
+			gm.CardDescription(g.Text("Card description")),
 		),
 
 		gm.CardContent(
-			gm.ButtonEl(gm.ButtonPrimary, gm.ButtonDefault, false, g.Text("Click me")),
-			gm.Badge(gm.BadgeSuccess, g.Text("Success")),
+			gm.Button(gm.ButtonPrimary, gm.ButtonDefault, g.Text("Click me")),
+			gm.Badge(gm.BadgeSecondary, g.Text("Badge")),
 		),
 	)
 

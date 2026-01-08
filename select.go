@@ -177,5 +177,14 @@ func Select(opts []SelectOption, children ...g.Node) g.Node {
 
 // SelectAssets includes the necessary JS for Select components
 func SelectAssets() g.Node {
-	return h.Script(h.Src("https://cdn.jsdelivr.net/npm/basecoat-css@0.3.9/dist/js/select.min.js"), h.Defer())
+	return h.Script(h.Src("https://cdn.jsdelivr.net/npm/basecoat-css@0.3.10-beta.2/dist/js/select.min.js"), h.Defer())
 }
+
+// Combobox is an alias for SelectWithSearch - they use the same structure
+// Combobox provides autocomplete input with a list of suggestions
+func Combobox(props SelectWithSearchProps) g.Node {
+	return SelectWithSearch(props)
+}
+
+// ComboboxProps is an alias for SelectWithSearchProps
+type ComboboxProps = SelectWithSearchProps

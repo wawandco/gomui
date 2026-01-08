@@ -6,28 +6,41 @@ import (
 )
 
 // DarkModeScript initializes theme detection and applies saved theme preference
+// This script should be placed in the <head> of your page to avoid flash of unstyled content
 func DarkModeScript() g.Node {
 	return h.Script(g.Raw(`
-		(function() {
-			const theme = localStorage.getItem('theme') || 'light';
-			document.documentElement.classList.toggle('dark', theme === 'dark');
+		(() => {
+			try {
+				const stored = localStorage.getItem('themeMode');
+				if (stored ? stored === 'dark'
+						  : matchMedia('(prefers-color-scheme: dark)').matches) {
+					document.documentElement.classList.add('dark');
+				}
+			} catch (_) {}
+
+			const apply = dark => {
+				document.documentElement.classList.toggle('dark', dark);
+				try { localStorage.setItem('themeMode', dark ? 'dark' : 'light'); } catch (_) {}
+			};
+
+			document.addEventListener('basecoat:theme', (event) => {
+				const mode = event.detail?.mode;
+				apply(mode === 'dark' ? true
+					: mode === 'light' ? false
+					: !document.documentElement.classList.contains('dark'));
+			});
 		})();
 	`))
 }
 
 // ThemeToggle creates a theme switcher button for toggling between light/dark modes
-func ThemeToggle(id string, children ...g.Node) g.Node {
+func ThemeToggle(children ...g.Node) g.Node {
 	return h.Button(
-		h.ID(id),
 		h.Type("button"),
-		g.Attr("onclick", `
-			const html = document.documentElement;
-			const isDark = html.classList.toggle('dark');
-			localStorage.setItem('theme', isDark ? 'dark' : 'light');
-		`),
-
-		g.Group(children),
 		h.Class("btn-icon-outline size-8"),
+		h.Aria("label", "Toggle dark mode"),
+		g.Attr("onclick", `document.dispatchEvent(new CustomEvent('basecoat:theme'))`),
+		g.Group(children),
 	)
 }
 
@@ -35,14 +48,14 @@ func ThemeToggle(id string, children ...g.Node) g.Node {
 func BasecoatCSS() g.Node {
 	return h.Link(
 		h.Rel("stylesheet"),
-		h.Href("https://cdn.jsdelivr.net/npm/basecoat-css@0.3.9/dist/basecoat.cdn.min.css"),
+		h.Href("https://cdn.jsdelivr.net/npm/basecoat-css@0.3.10-beta.2/dist/basecoat.cdn.min.css"),
 	)
 }
 
 // BasecoatJS includes Basecoat JavaScript from CDN
 func BasecoatJS() g.Node {
 	return h.Script(
-		h.Src("https://cdn.jsdelivr.net/npm/basecoat-css@0.3.9/dist/js/all.min.js"),
+		h.Src("https://cdn.jsdelivr.net/npm/basecoat-css@0.3.10-beta.2/dist/js/all.min.js"),
 		g.Attr("defer"),
 	)
 }

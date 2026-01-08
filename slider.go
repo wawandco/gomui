@@ -11,7 +11,8 @@ func Slider(attrs ...g.Node) g.Node {
 	return h.Input(
 		g.Group(attrs),
 		h.Type("range"),
-		h.Class("input w-full"),
+		h.Class("input"),
+		h.Style("width: 100%;"),
 	)
 }
 

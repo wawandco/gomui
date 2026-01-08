@@ -524,22 +524,9 @@ func UserList(users []User) g.Node {
 }
 ```
 
-## Examples
-
-Check out the `/examples` directory for complete working examples:
-
-- **Basic Page** - Simple page with cards and buttons
-- **Form Example** - Complete form with validation
-- **Dashboard** - Full dashboard with navigation and charts
-- **E-commerce** - Product listing with filters
-
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-MIT License - see LICENSE file for details
 
 ## Credits
 
